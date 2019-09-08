@@ -39,7 +39,7 @@
  * STM8L101x open source driver
  *
  * Contact Information:
- * Pavel Nadein <pavel.nadein@gmail.com>
+ * Pavel Nadein <pavelnadein@gmail.com>
  */
 
 #ifndef STM8L_SPI_H
