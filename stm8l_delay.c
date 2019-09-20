@@ -43,11 +43,12 @@
  */
 
 #include "stm8l_delay.h"
+#include "stm8l_clk.h"
 
-void delays_init (u8 PRESCALER)
+void delays_init (void)
 {
   CLK->PCKENR |= CLK_PCKENR_TIM4;
-  TIM4->PSCR = PRESCALER & TIM4_PSCR_PSC;
+  TIM4->PSCR = clk_get_freq_MHz();
   TIM4->EGR |= TIM4_EGR_UG;
   TIM4->CR1 = TIM4_CR1_CEN;
 }

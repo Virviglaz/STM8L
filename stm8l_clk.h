@@ -42,13 +42,26 @@
  * Pavel Nadein <pavelnadein@gmail.com>
  */
 
-#ifndef STM8L_DELAY_H
-#define STM8L_DELAY_H
+#ifndef STM8L_CLK_H
+#define STM8L_CLK_H
 
 #include "stm8l10x.h"
 
-void delays_init (void);
-void delay_us (u8 us);
-void delay_ms (u16 ms);
+#define HSI_16MHZ	CLK_NO_DIV
+#define HSI_8MHZ	CLK_DIV_2
+#define HSI_4MHZ	CLK_DIV_4
+#define HSI_2MHZ	CLK_DIV_8
 
-#endif // STM8L_DELAY_H
+enum clk_div
+{
+	CLK_NO_DIV = 0,
+	CLK_DIV_2 = 1,
+	CLK_DIV_4 = 2,
+	CLK_DIV_8 = 3,
+};
+
+void clk_set(enum clk_div clk);
+enum clk_div clk_get(void);
+u8 clk_get_freq_MHz(void);
+
+#endif // STM8L_CLK_H

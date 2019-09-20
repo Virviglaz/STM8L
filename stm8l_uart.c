@@ -42,13 +42,68 @@
  * Pavel Nadein <pavelnadein@gmail.com>
  */
 
-#ifndef STM8L_DELAY_H
-#define STM8L_DELAY_H
+#include "stm8l_uart.h"
+#include "stm8l_clk.h"
 
-#include "stm8l10x.h"
+static struct
+{
+	volatile char *rx_buf;
+	volatile uint16_t pos;
+	uint16_t size;
+	bool is_done;
+} rx;
 
-void delays_init (void);
-void delay_us (u8 us);
-void delay_ms (u16 ms);
+void uart_init(uint16_t freq)
+{
+	uint16_t uart_div = clk_get_freq_MHz() * 1000000u / freq;
+	CLK->PCKENR |= CLK_PCKENR_USART;
 
-#endif // STM8L_DELAY_H
+	USART->BRR1 = (uart_div & 0x0FF0) >> 4;
+	USART->BRR2 = (uart_div & 0xF000) >> 8 | (uart_div & 0x000F);
+	USART->CR2 = USART_CR2_TEN;
+}
+
+void uart_enable_rx_irq(char *buf, uint16_t size)
+{
+	rx.rx_buf = buf;
+	rx.size = size;
+	rx.pos = 0;
+	rx.is_done = false;
+
+	USART->CR2 |= USART_CR2_RIEN;
+}
+
+uint16_t uart_check_rx(void)
+{
+	static bool last_buffer_was_full = false;
+
+	if (!rx.is_done)
+		return 0;
+
+	if (last_buffer_was_full) {
+		rx.pos = 0;
+		rx.is_done = false;
+		return 0;
+	}
+
+	last_buffer_was_full = true;
+	return rx.pos;
+}
+
+INTERRUPT_HANDLER(USART_RX_IRQHandler, 28)
+{
+	char data = USART->DR;
+
+	/* If buffer is still full, do nothing */
+	if (rx.pos == rx.size || rx.is_done)
+		return;
+
+	/* Buffer full or newline received */
+	if (data == '\n' || data == 0) {
+		rx.rx_buf[rx.pos] = 0; /* null terminate */
+		rx.is_done = true;
+		return;
+	}
+
+	rx.rx_buf[rx.pos++] = data;
+}

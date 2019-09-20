@@ -42,13 +42,13 @@
  * Pavel Nadein <pavelnadein@gmail.com>
  */
 
-#ifndef STM8L_DELAY_H
-#define STM8L_DELAY_H
+#ifndef STM8L_UART_H
+#define STM8L_UART_H
 
 #include "stm8l10x.h"
 
-void delays_init (void);
-void delay_us (u8 us);
-void delay_ms (u16 ms);
+void uart_init(uint16_t freq);
+void uart_enable_rx_irq(char *buf, uint16_t size);
+uint16_t uart_check_rx(void);
 
-#endif // STM8L_DELAY_H
+#endif // STM8L_UART_H

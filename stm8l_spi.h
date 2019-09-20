@@ -50,14 +50,14 @@
 
 enum spi_clock { SPI_CLOCK_LOW, SPI_CLOCK_HIGH };
 enum spi_freq {
-	CLOCK_DEV_2 = 0x00,
-	CLOCK_DEV_4 = 0x08,
-	CLOCK_DEV_8 = 0x10,
-	CLOCK_DEV_16 = 0x18,
-	CLOCK_DEV_32 = 0x20,
-	CLOCK_DEV_64 = 0x28,
-	CLOCK_DEV_128 = 0x30,
-	CLOCK_DEV_256 = 0x38,
+	CLOCK_DIV_2 = 0x00,
+	CLOCK_DIV_4 = 0x08,
+	CLOCK_DIV_8 = 0x10,
+	CLOCK_DIV_16 = 0x18,
+	CLOCK_DIV_32 = 0x20,
+	CLOCK_DIV_64 = 0x28,
+	CLOCK_DIV_128 = 0x30,
+	CLOCK_DIV_256 = 0x38,
 };
 
 void spi_init(enum spi_clock clock, enum spi_freq freq);
