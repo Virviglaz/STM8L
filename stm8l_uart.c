@@ -70,7 +70,7 @@ void uart_enable_rx_irq(char *buf, uint16_t size)
 	rx.pos = 0;
 	rx.is_done = false;
 
-	USART->CR2 |= USART_CR2_RIEN;
+	USART->CR2 |= USART_CR2_RIEN | USART_CR2_REN;
 }
 
 uint16_t uart_check_rx(void)
@@ -90,6 +90,14 @@ uint16_t uart_check_rx(void)
 	return rx.pos;
 }
 
+void uart_send_string(const char *buf)
+{
+	while(*buf) {
+		while(!(USART->SR & USART_SR_TXE));
+		USART->DR = *buf++;
+	}
+}
+
 INTERRUPT_HANDLER(USART_RX_IRQHandler, 28)
 {
 	char data = USART->DR;
@@ -99,7 +107,7 @@ INTERRUPT_HANDLER(USART_RX_IRQHandler, 28)
 		return;
 
 	/* Buffer full or newline received */
-	if (data == '\n' || data == 0) {
+	if (data == '\n' || data == '\r' || data == 0) {
 		rx.rx_buf[rx.pos] = 0; /* null terminate */
 		rx.is_done = true;
 		return;
