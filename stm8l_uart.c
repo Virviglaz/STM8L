@@ -48,8 +48,8 @@
 static struct
 {
 	volatile char *rx_buf;
-	volatile uint16_t pos;
-	uint16_t size;
+	volatile uint8_t pos;
+	uint8_t size;
 	bool is_done;
 } rx;
 
@@ -75,19 +75,14 @@ void uart_enable_rx_irq(char *buf, uint16_t size)
 
 uint16_t uart_check_rx(void)
 {
-	static bool last_buffer_was_full = false;
-
+	u8 len = rx.pos;
 	if (!rx.is_done)
 		return 0;
 
-	if (last_buffer_was_full) {
-		rx.pos = 0;
-		rx.is_done = false;
-		return 0;
-	}
+	rx.pos = 0;
+	rx.is_done = false;
 
-	last_buffer_was_full = true;
-	return rx.pos;
+	return len;
 }
 
 void uart_send_string(const char *buf)
