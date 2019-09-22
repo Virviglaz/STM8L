@@ -93,6 +93,12 @@ void uart_send_string(const char *buf)
 	}
 }
 
+void uart_send_line(const char *buf)
+{
+	uart_send_string(buf);
+	uart_send_string("\r\n");
+}
+
 INTERRUPT_HANDLER(USART_RX_IRQHandler, 28)
 {
 	char data = USART->DR;

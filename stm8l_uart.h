@@ -51,5 +51,6 @@ void uart_init(uint16_t freq);
 void uart_enable_rx_irq(char *buf, uint16_t size);
 uint16_t uart_check_rx(void);
 void uart_send_string(const char *buf);
+void uart_send_line(const char *buf);
 
 #endif // STM8L_UART_H
