@@ -42,27 +42,13 @@
  * Pavel Nadein <pavelnadein@gmail.com>
  */
 
-#include "stm8l_delay.h"
-#include "stm8l_clk.h"
+#ifndef STM8L_TIM4_H
+#define STM8L_TIM4_H
 
-void delays_init (void)
-{
-	CLK->PCKENR |= CLK_PCKENR_TIM4;
-	TIM4->PSCR = clk_get_freq_MHz() >> 2;
-	TIM4->EGR |= TIM4_EGR_UG;
-	TIM4->SR1 = 0;
-	TIM4->CR1 = TIM4_CR1_CEN;
-}
+#include "stm8l10x.h"
 
-void delay_us (u8 us)
-{
-	TIM4->CNTR = 0;
-	while (TIM4->CNTR < us);
-}
+void tim4_init(u8 div);
+void tim4_enable_irq(void (*handler)(void), u8 period);
+INTERRUPT_HANDLER(TIM4_UPD_OVF_IRQHandler, 25);
 
-void delay_ms (u16 ms)
-{
-	ms = ms << 2;
-	while (ms--) delay_us(250);
-}
-
+#endif // STM8L_TIM4_H

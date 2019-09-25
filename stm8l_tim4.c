@@ -42,27 +42,30 @@
  * Pavel Nadein <pavelnadein@gmail.com>
  */
 
-#include "stm8l_delay.h"
-#include "stm8l_clk.h"
+#include "stm8l_tim4.h"
 
-void delays_init (void)
+static void (*irq_handler)(void) = 0;
+static u8 irq_period;
+
+void tim4_init(u8 div)
 {
 	CLK->PCKENR |= CLK_PCKENR_TIM4;
-	TIM4->PSCR = clk_get_freq_MHz() >> 2;
+	TIM4->PSCR = 0x0F & div >> 2;
 	TIM4->EGR |= TIM4_EGR_UG;
 	TIM4->SR1 = 0;
 	TIM4->CR1 = TIM4_CR1_CEN;
 }
 
-void delay_us (u8 us)
+void tim4_enable_irq(void (*handler)(void), u8 period)
 {
-	TIM4->CNTR = 0;
-	while (TIM4->CNTR < us);
+	irq_handler = handler;
+	irq_period = period ? period : 0xFF;
+	TIM4->IER = TIM4_IER_UIE;
 }
 
-void delay_ms (u16 ms)
+INTERRUPT_HANDLER(TIM4_UPD_OVF_IRQHandler, 25)
 {
-	ms = ms << 2;
-	while (ms--) delay_us(250);
+	TIM4->SR1 = 0;
+	irq_handler();
+	TIM4->CNTR = irq_period;
 }
-
