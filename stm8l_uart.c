@@ -55,7 +55,7 @@ static struct
 
 void uart_init(uint16_t freq)
 {
-	uint16_t uart_div = clk_get_freq_MHz() * 1000000u / freq;
+	uint16_t uart_div = clk_get_freq_MHz() * (1000000u / freq);
 	CLK->PCKENR |= CLK_PCKENR_USART;
 
 	USART->BRR1 = (uart_div & 0x0FF0) >> 4;
