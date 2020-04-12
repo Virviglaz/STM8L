@@ -42,18 +42,41 @@
  * Pavel Nadein <pavelnadein@gmail.com>
  */
 
-#include "stm8l_gpio.h"
+#ifndef STM8L_AWU_H
+#define STM8L_AWU_H
 
-/* Init pin with default settings */
-void gpio_init(GPIO_TypeDef *gpio, enum gpio_pin pin, enum gpio_dir dir)
+#include "stm8l10x.h"
+
+enum awu_timebase_t {
+	AWU_Timebase_No_IT  = (uint8_t)0,    /*!< No AWU interrupt selected */
+	AWU_Timebase_250us  = (uint8_t)1,    /*!< AWU Timebase equals 0.25 ms */
+	AWU_Timebase_500us  = (uint8_t)2,    /*!< AWU Timebase equals 0.5 ms */
+	AWU_Timebase_1ms    = (uint8_t)3,    /*!< AWU Timebase equals 1 ms */
+	AWU_Timebase_2ms    = (uint8_t)4,    /*!< AWU Timebase equals 2 ms */
+	AWU_Timebase_4ms    = (uint8_t)5,    /*!< AWU Timebase equals 4 ms */
+	AWU_Timebase_8ms    = (uint8_t)6,    /*!< AWU Timebase equals 8 ms */
+	AWU_Timebase_16ms   = (uint8_t)7,    /*!< AWU Timebase equals 16 ms */
+	AWU_Timebase_32ms   = (uint8_t)8,    /*!< AWU Timebase equals 32 ms */
+	AWU_Timebase_64ms   = (uint8_t)9,    /*!< AWU Timebase equals 64 ms */
+	AWU_Timebase_128ms  = (uint8_t)10,   /*!< AWU Timebase equals 128 ms */
+	AWU_Timebase_256ms  = (uint8_t)11,   /*!< AWU Timebase equals 256 ms */
+	AWU_Timebase_512ms  = (uint8_t)12,   /*!< AWU Timebase equals 512 ms */
+	AWU_Timebase_1s     = (uint8_t)13,   /*!< AWU Timebase equals 1 s */
+	AWU_Timebase_2s     = (uint8_t)14,   /*!< AWU Timebase equals 2 s */
+	AWU_Timebase_12s    = (uint8_t)15,   /*!< AWU Timebase equals 12 s */
+	AWU_Timebase_30s    = (uint8_t)16    /*!< AWU Timebase equals 30 s */
+};
+
+static inline void awu_enable(void)
 {
-	gpio_set_dir(gpio, pin, dir);
-	if (dir == OUTPUT) {
-		gpio_set_output(gpio, pin, PUSH_PULL);
-		gpio_set_speed(gpio, pin, SPEED_2MHz);
-		gpio_reset(gpio, pin);
-	} else {
-		gpio_pullup(gpio, pin, false);
-		gpio_irq(gpio, pin, false);
-	}
+	AWU->CSR |= AWU_CSR_AWUEN;
 }
+
+static inline void awu_disable(void)
+{
+	AWU->CSR &= ~AWU_CSR_AWUEN;
+}
+
+void awu_init(enum awu_timebase_t timebase);
+
+#endif /* STM8L_CLK_H */

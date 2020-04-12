@@ -42,18 +42,24 @@
  * Pavel Nadein <pavelnadein@gmail.com>
  */
 
-#include "stm8l_gpio.h"
+#include "stm8l_awu.h"
 
-/* Init pin with default settings */
-void gpio_init(GPIO_TypeDef *gpio, enum gpio_pin pin, enum gpio_dir dir)
+static const uint8_t apr_array[] =
+	{0, 8, 16, 32, 62, 62, 62, 62, 62, 62, 62, 62, 62, 61, 61, 36, 14};
+static const uint8_t tbr_array[] =
+	{0,  1,  1,  1, 1,  2,  3,  4,  5,  6, 7,  8,  9, 10, 11, 14, 15};
+
+
+void awu_init(enum awu_timebase_t timebase)
 {
-	gpio_set_dir(gpio, pin, dir);
-	if (dir == OUTPUT) {
-		gpio_set_output(gpio, pin, PUSH_PULL);
-		gpio_set_speed(gpio, pin, SPEED_2MHz);
-		gpio_reset(gpio, pin);
-	} else {
-		gpio_pullup(gpio, pin, false);
-		gpio_irq(gpio, pin, false);
-	}
+	CLK->PCKENR |= CLK_PCKENR_AWU;
+
+	/* Enable the AWU peripheral */
+	AWU->CSR |= AWU_CSR_AWUEN;
+	AWU->TBR &= (u8)(~AWU_TBR_AWUTB);
+	AWU->TBR |= tbr_array[(u8)timebase];
+
+	/* Set the APR divider */
+	AWU->APR &= (u8)(~AWU_APR_APR);
+	AWU->APR |= apr_array[(u8)timebase];
 }
