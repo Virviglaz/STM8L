@@ -47,8 +47,12 @@
 
 #include "stm8l10x.h"
 
+static inline void tim4_disable_irq(void)
+{
+	TIM4->IER = 0;
+}
+
 void tim4_init(u8 div);
 void tim4_enable_irq(void (*handler)(void), u8 period);
-INTERRUPT_HANDLER(TIM4_UPD_OVF_IRQHandler, 25);
 
 #endif // STM8L_TIM4_H

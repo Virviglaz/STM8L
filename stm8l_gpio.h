@@ -123,6 +123,12 @@ enum gpio_pin
 enum gpio_dir { INPUT, OUTPUT };
 enum gpio_speed { SPEED_2MHz, SPEED_10MHz };
 enum gpio_output_type { OPEN_DRAIN, PUSH_PULL };
+enum exti_edge {
+	FALLING_AND_LOW_LEVEL,
+	RISING_EDGE,
+	FALLING_EDGE,
+	RISING_AND_FALLING_EDGE,
+};
 
 typedef struct { GPIO_TypeDef *gpio; enum gpio_pin pin; } gpio_pin;
 
@@ -192,11 +198,8 @@ static inline void gpio_set_speed(GPIO_TypeDef *gpio, enum gpio_pin pin,
 		gpio->CR2 | (u8)pin : gpio->CR2 & (~(u8)pin);
 }
 
-static inline void gpio_irq(GPIO_TypeDef *gpio, enum gpio_pin pin, bool irq)
-{
-	gpio->CR2 = irq ? gpio->CR2 | (u8)pin : gpio->CR2 & (~(u8)pin);
-}
-
+void gpio_irq(GPIO_TypeDef *gpio, enum gpio_pin pin, bool irq,
+	      enum exti_edge edge);
 void gpio_init(GPIO_TypeDef *gpio, enum gpio_pin pin, enum gpio_dir dir);
 
 #endif /* STM8L_GPIO_H */

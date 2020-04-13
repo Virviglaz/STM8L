@@ -103,9 +103,15 @@ INTERRUPT_HANDLER(USART_RX_IRQHandler, 28)
 {
 	char data = USART->DR;
 
-	/* If buffer is still full, do nothing */
-	if (rx.pos == rx.size || rx.is_done)
+	/* Data not handled */
+	if (rx.is_done)
 		return;
+
+	/* Buffer overrun! */
+	if (rx.pos == rx.size) {
+		rx.pos = 0;
+		return;
+	}
 
 	/* Buffer full or newline received */
 	if (data == '\n' || data == '\r' || data == 0) {

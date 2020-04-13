@@ -50,16 +50,18 @@ static u8 irq_period;
 void tim4_init(u8 div)
 {
 	CLK->PCKENR |= CLK_PCKENR_TIM4;
-	TIM4->PSCR = 0x0F & div >> 2;
+	TIM4->PSCR = 0x0F & div;
 	TIM4->EGR |= TIM4_EGR_UG;
 	TIM4->SR1 = 0;
+	TIM4->CNTR = 0;
 	TIM4->CR1 = TIM4_CR1_CEN;
 }
 
 void tim4_enable_irq(void (*handler)(void), u8 period)
 {
 	irq_handler = handler;
-	irq_period = period ? period : 0xFF;
+	irq_period = period;
+	TIM4->CNTR = 0;
 	TIM4->IER = TIM4_IER_UIE;
 }
 

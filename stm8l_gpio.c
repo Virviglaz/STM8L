@@ -44,6 +44,50 @@
 
 #include "stm8l_gpio.h"
 
+void gpio_irq(GPIO_TypeDef *gpio, enum gpio_pin pin, bool irq,
+	      enum exti_edge edge)
+{
+	gpio->CR2 = irq ? gpio->CR2 | (u8)pin : gpio->CR2 & (~(u8)pin);
+
+	if (!irq)
+		return;
+
+	switch (pin) {
+	case PIN_0:
+		EXTI->CR1 &= ~(3 << 0);
+		EXTI->CR1 |= edge << 0;
+		break;
+	case PIN_1:
+		EXTI->CR1 &= ~(3 << 2);
+		EXTI->CR1 |= edge << 2;
+		break;
+	case PIN_2:
+		EXTI->CR1 &= ~(3 << 4);
+		EXTI->CR1 |= edge << 4;
+		break;
+	case PIN_3:
+		EXTI->CR1 &= ~(3 << 6);
+		EXTI->CR1 |= edge << 6;
+		break;
+	case PIN_4:
+		EXTI->CR2 &= ~(3 << 0);
+		EXTI->CR2 |= edge << 0;
+		break;
+	case PIN_5:
+		EXTI->CR2 &= ~(3 << 2);
+		EXTI->CR2 |= edge << 2;
+		break;
+	case PIN_6:
+		EXTI->CR2 &= ~(3 << 4);
+		EXTI->CR2 |= edge << 4;
+		break;
+	case PIN_7:
+		EXTI->CR2 &= ~(3 << 6);
+		EXTI->CR2 |= edge << 6;
+		break;
+	}
+}
+
 /* Init pin with default settings */
 void gpio_init(GPIO_TypeDef *gpio, enum gpio_pin pin, enum gpio_dir dir)
 {
@@ -52,8 +96,6 @@ void gpio_init(GPIO_TypeDef *gpio, enum gpio_pin pin, enum gpio_dir dir)
 		gpio_set_output(gpio, pin, PUSH_PULL);
 		gpio_set_speed(gpio, pin, SPEED_2MHz);
 		gpio_reset(gpio, pin);
-	} else {
+	} else
 		gpio_pullup(gpio, pin, false);
-		gpio_irq(gpio, pin, false);
-	}
 }
