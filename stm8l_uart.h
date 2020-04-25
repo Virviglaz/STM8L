@@ -57,6 +57,11 @@ static inline void uart_disable(void)
 	USART->CR2 &= ~USART_CR2_TEN;
 }
 
+static inline void uart_deinit(void)
+{
+	CLK->PCKENR &= ~CLK_PCKENR_USART;
+}
+
 void uart_init(uint16_t freq);
 void uart_enable_rx_irq(char *buf, uint16_t size);
 uint16_t uart_check_rx(void);
