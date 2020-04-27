@@ -49,10 +49,13 @@ static const uint8_t apr_array[] =
 static const uint8_t tbr_array[] =
 	{0,  1,  1,  1, 1,  2,  3,  4,  5,  6, 7,  8,  9, 10, 11, 14, 15};
 
+static void (*handler)(void);
 
-void awu_init(enum awu_timebase_t timebase)
+void awu_init(enum awu_timebase_t timebase, void (*callback)(void))
 {
 	CLK->PCKENR |= CLK_PCKENR_AWU;
+
+	handler = callback;
 
 	/* Enable the AWU peripheral */
 	AWU->CSR |= AWU_CSR_AWUEN;
@@ -62,4 +65,10 @@ void awu_init(enum awu_timebase_t timebase)
 	/* Set the APR divider */
 	AWU->APR &= (u8)(~AWU_APR_APR);
 	AWU->APR |= apr_array[(u8)timebase];
+}
+
+INTERRUPT_HANDLER(AWU_IRQHandler, 4)
+{
+	handler();
+	AWU->CSR;
 }

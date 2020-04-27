@@ -77,6 +77,6 @@ static inline void awu_disable(void)
 	AWU->CSR &= ~AWU_CSR_AWUEN;
 }
 
-void awu_init(enum awu_timebase_t timebase);
+void awu_init(enum awu_timebase_t timebase, void (*callback)(void));
 
-#endif /* STM8L_CLK_H */
+#endif /* STM8L_AWU_H */
