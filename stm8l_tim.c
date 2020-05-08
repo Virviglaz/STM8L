@@ -4,7 +4,7 @@
  *
  * MIT License
  *
- * Copyright (c) 2020 Pavel Nadein
+ * Copyright (c) 2019 Pavel Nadein
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -42,22 +42,4 @@
  * Pavel Nadein <pavelnadein@gmail.com>
  */
 
-#ifndef STM8L_TIM4_H
-#define STM8L_TIM4_H
-
-#include "stm8l10x.h"
-
-static inline void tim4_disable_irq(void)
-{
-	TIM4->IER = 0;
-}
-
-static inline u8 tim4_value(void)
-{
-	return TIM4->CNTR;
-}
-
-void tim4_init(u8 div);
-void tim4_enable_irq(void (*handler)(void), u8 period);
-
-#endif // STM8L_TIM4_H
+#include "stm8l_tim.h"
