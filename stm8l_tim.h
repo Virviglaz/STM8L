@@ -4,7 +4,7 @@
  *
  * MIT License
  *
- * Copyright (c) 2019 Pavel Nadein
+ * Copyright (c) 2020 Pavel Nadein
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -47,6 +47,7 @@
 
 #include "stm8l10x.h"
 
+TIM_TypeDef *tim_init(const u8 tim, u8 div, u16 period, void (*handler)(void));
+void tim_pwm_init(TIM_TypeDef *base, const u8 ch, u16 duty);
 
-
-#endif // STM8L_TIM_H
+#endif /* STM8L_TIM_H */

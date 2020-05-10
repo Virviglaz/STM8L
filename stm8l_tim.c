@@ -4,7 +4,7 @@
  *
  * MIT License
  *
- * Copyright (c) 2019 Pavel Nadein
+ * Copyright (c) 2020 Pavel Nadein
  *
  * Permission is hereby granted, free of charge, to any person obtaining a copy
  * of this software and associated documentation files (the "Software"), to deal
@@ -43,3 +43,66 @@
  */
 
 #include "stm8l_tim.h"
+
+static void (*tim2_irq_handler)(void);
+static void (*tim3_irq_handler)(void);
+
+TIM_TypeDef *tim_init(const u8 tim, u8 div, u16 period, void (*handler)(void))
+{
+	TIM_TypeDef *base;
+	switch (tim) {
+	case 2:
+		CLK->PCKENR |= CLK_PCKENR_TIM2;
+		tim2_irq_handler = handler;
+		base = TIM2;
+		break;
+	case 3:
+		CLK->PCKENR |= CLK_PCKENR_TIM3;
+		tim3_irq_handler = handler;
+		base = TIM3;
+		break;
+	default:
+		return 0;
+	}
+
+	base->CR1 = 0;
+	base->PSCR = div;
+	base->CR2 = 0;
+	base->ARRH = (u8)(period >> 8);
+	base->ARRL = (u8)(period);
+	base->EGR |= TIM_EGR_UG;
+	if (handler)
+		base->IER = TIM_IER_UIE;
+	base->CR1 = TIM_CR1_CEN;
+	return base;
+}
+
+void tim_pwm_init(TIM_TypeDef *base, const u8 ch, u16 duty)
+{
+	switch(ch) {
+	case 1:
+		base->CCER1 |= TIM_CCER1_CC1E;
+		base->CCMR1 = 0x60; /* PWM1, no preload */
+  		base->CCR1H = (u8)(duty >> 8);
+  		base->CCR1L = (u8)(duty);
+		break;
+	case 2:
+		base->CCER1 |= TIM_CCER1_CC2E;
+		base->CCMR2 = 0x60; /* PWM1, no preload */
+  		base->CCR2H = (u8)(duty >> 8);
+  		base->CCR2L = (u8)(duty);
+		break;
+	}
+}
+
+INTERRUPT_HANDLER(TIM2_UPD_OVF_TRG_BRK_IRQHandler, 19)
+{
+	tim2_irq_handler();
+	TIM2->SR1 = 0;
+}
+
+INTERRUPT_HANDLER(TIM3_UPD_OVF_TRG_BRK_IRQHandler, 21)
+{
+	tim3_irq_handler();
+	TIM3->SR1 = 9;
+}
